@@ -1,0 +1,10 @@
+[Unit]
+Description=Schedule for incremental database backups
+
+[Timer]
+OnCalendar=Mon,Thu,Tue,Fri,Sun *-*-* 07,19:00:00
+OnCalendar=Wed,Sat *-*-* 19:00:00
+RandomizedDelaySec=1h
+
+[Install]
+WantedBy=timers.target

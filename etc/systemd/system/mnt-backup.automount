@@ -1,0 +1,10 @@
+[Unit]
+Description=Automount backup destination folder
+After=network-online.target
+
+[Automount]
+Where=/mnt/backup
+TimeoutIdleSec=480
+
+[Install]
+WantedBy=multi-user.target

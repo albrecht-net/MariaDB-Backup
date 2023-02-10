@@ -1,0 +1,10 @@
+[Unit]
+Description=Schedule for full database backups
+
+[Timer]
+OnStartupSec=20m
+OnCalendar=Wed,Sat *-*-* 07:00:00
+RandomizedDelaySec=1h
+
+[Install]
+WantedBy=timers.target

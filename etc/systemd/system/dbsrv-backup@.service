@@ -1,0 +1,23 @@
+[Unit]
+Description=Database backup creation using mariabackup
+After=mariadb.service
+Requisite=mariadb.service
+
+[Service]
+Type=oneshot
+
+TimeoutStartSec=480
+
+User=mysql
+Group=mysql
+
+ProtectHome=true
+ProtectSystem=full
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+
+ExecStart=/var/opt/dbsrv-backup/%p.sh -%i
+
+[Install]
+WantedBy=multi-user.target

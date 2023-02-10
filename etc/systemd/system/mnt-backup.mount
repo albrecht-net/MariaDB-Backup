@@ -1,0 +1,13 @@
+[Unit]
+Description=Mount backup destination folder
+After=network-online.target
+
+[Mount]
+What=//your/remote/folder
+Where=/mnt/backup
+Options=users,credentials=/root/.smbcredentials,uid=106,gid=112
+Type=cifs
+TimeoutSec=30
+
+[Install]
+WantedBy=multi-user.target
