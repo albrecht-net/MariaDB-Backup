@@ -41,12 +41,13 @@ sudo chmod 0400 /root/.smbcredentials
 - Run the first full backup:
 `sudo -u mysql /var/opt/dbsrv-backup/dbsrv-backup.sh -f`
 - Check if the exit code is 0: `echo $?`
-- Check the mariabackup log (*/var/opt/dbsrv-backup/dbsrv-backup_YYYY-MM-DD-hhmm.full/dbsrv-backup.log*) if it completed successfully. This logfile can also be found in */mnt/backup/dbsrv-backup_YYYY-MM-DD-hhmm.inc.tar.gz*.
+- Check the mariabackup log (*/var/opt/dbsrv-backup/dbsrv-backup_YYYY-mm-dd-HHMM.full/dbsrv-backup.log*) if it completed successfully. This logfile can also be found in */mnt/backup/dbsrv-backup_YYYY-mm-dd-HHMM.inc.tar.gz*.
 - Run the first incremental backup:
 `sudo -u mysql /var/opt/dbsrv-backup/dbsrv-backup.sh -i`
 - Check if the exit code is 0: `echo $?`
-- Check the mariabackup log if it completed successfully. This logfile can be found in */mnt/backup/dbsrv-backup_YYYY-MM-DD-hhmm.inc.tar.gz*.
+- Check the mariabackup log if it completed successfully. This logfile can be found in */mnt/backup/dbsrv-backup_YYYY-mm-dd-HHMM.inc.tar.gz*.
 
+## Create backup
 ### Enable and start services in systemd
 - Reload systemd with `sudo systemctl daemon-reload`
 - Enable the timers: `sudo systemctl enable dbsrv-backup@f.timer` and `sudo systemctl enable dbsrv-backup@i.timer`
@@ -59,8 +60,26 @@ sudo chmod 0400 /root/.smbcredentials
 - Reload systemd with `sudo systemctl daemon-reload`.
 - Confirm next execution time with `systemctl list-timers`.
 
+## Restore backup
+1. Choose the backup archive in */mnt/backup/* with the timestamp you want to restore and copy it to a temporary folder.
+2. Change directory to the temporary folder.
+3. Untar the archive: `tar-xzf /dbsrv-backup_YYYY-mm-dd-HHMM.[full/inc].tar.gz`
+4. If the choosen archive is a incremental backup, proceed with step 5, otherwise with step 7.
+5. Search the entry of the choosen archive in the *./backup-databases.log* and look up which base dir was used at *Base dir used: [...]*
+6. Copy the mentioned full backup archive to the same folder as in step 1 and untar the with `tar-xzf /dbsrv-backup_YYYY-mm-dd-HHMM.full.tar.gz`.
+7. First prepare the full backup with `mariabackup --prepare --target=./dbsrv-backup_YYYY-mm-dd-HHMM.full/data/`.
+8. If needed, prepare the incremental backup with `mariabackup --prepare --target=./dbsrv-backup_YYYY-mm-dd-HHMM.full/data/ --incremental-dir=./dbsrv-backup_YYYY-mm-dd-HHMM.inc/data/` to update the base (full) backup with the deltas of the incremental backup[^5].
+9. If the database is still running, stop the MariaDB server process.
+10. Copy the prepared data back to the mariadb datadir executing `mariabackup --copy-back --target=./dbsrv-backup_YYYY-mm-dd-HHMM.full.full/data/`[^6].
+11. Fix the file permissions with `chown -R mysql:mysql /var/lib/mysql/`.
+12. Finally start the MariaDB server process.
+13. The created folder for the restoring procedure can be deleted.
+
 ***
+
 [^1]: [Installing mariabackup](https://mariadb.com/kb/en/mariabackup-overview/#installing-on-linux) \
 [^2]: MariaDB kb: [Authentication and Privileges](https://mariadb.com/kb/en/mariabackup-overview/#authentication-and-privileges) \
 [^3]: MariaDB kb: [--password](https://mariadb.com/kb/en/mariabackup-options/#-p-password) \
-[^4]: Manpage [systemd.timer(5)](https://manpages.debian.org/bullseye/systemd/systemd.timer.5) and [systemd.time(7)](https://manpages.debian.org/bullseye/manpages-de/systemd.time.7)
+[^4]: Manpage [systemd.timer(5)](https://manpages.debian.org/bullseye/systemd/systemd.timer.5) and [systemd.time(7)](https://manpages.debian.org/bullseye/manpages-de/systemd.time.7) \
+[^5]: MariaDB kb: [Preparing the backup](https://mariadb.com/kb/en/incremental-backup-and-restore-with-mariabackup/#preparing-the-backup) \
+[^6]: MariaDB kb: [Restoring the Backup](https://mariadb.com/kb/en/incremental-backup-and-restore-with-mariabackup/#restoring-the-backup) \
