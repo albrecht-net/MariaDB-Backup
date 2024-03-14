@@ -67,10 +67,10 @@ sudo chmod 0400 /root/.smbcredentials
 4. If the choosen archive is a incremental backup, proceed with step 5, otherwise with step 7.
 5. Search the entry of the choosen archive in the *./backup-databases.log* and look up which base dir was used at *Base dir used: [...]*
 6. Copy the mentioned full backup archive to the same folder as in step 1 and untar the with `tar-xzf /dbsrv-backup_YYYY-mm-dd-HHMM.full.tar.gz`.
-7. First prepare the full backup with `mariabackup --prepare --target=./dbsrv-backup_YYYY-mm-dd-HHMM.full/data/`.
-8. If needed, prepare the incremental backup with `mariabackup --prepare --target=./dbsrv-backup_YYYY-mm-dd-HHMM.full/data/ --incremental-dir=./dbsrv-backup_YYYY-mm-dd-HHMM.inc/data/` to update the base (full) backup with the deltas of the incremental backup[^5].
+7. First prepare the full backup with `mariabackup --prepare --target-dir=./dbsrv-backup_YYYY-mm-dd-HHMM.full/data/`.
+8. If needed, prepare the incremental backup with `mariabackup --prepare --target-dir=./dbsrv-backup_YYYY-mm-dd-HHMM.full/data/ --incremental-dir=./dbsrv-backup_YYYY-mm-dd-HHMM.inc/data/` to update the base (full) backup with the deltas of the incremental backup[^5].
 9. If the database is still running, stop the MariaDB server process.
-10. Copy the prepared data back to the mariadb datadir executing `mariabackup --copy-back --target=./dbsrv-backup_YYYY-mm-dd-HHMM.full.full/data/`[^6].
+10. Copy the prepared data back to the mariadb datadir executing `mariabackup --copy-back --target-dir=./dbsrv-backup_YYYY-mm-dd-HHMM.full.full/data/`[^6].
 11. Fix the file permissions with `chown -R mysql:mysql /var/lib/mysql/`.
 12. Finally start the MariaDB server process.
 13. The created folder for the restoring procedure can be deleted.
