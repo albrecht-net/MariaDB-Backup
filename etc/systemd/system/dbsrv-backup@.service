@@ -2,6 +2,7 @@
 Description=Database backup creation using mariabackup
 After=mariadb.service
 Requisite=mariadb.service
+Wants=mnt-backup.mount
 
 [Service]
 Type=oneshot

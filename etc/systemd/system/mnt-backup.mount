@@ -1,6 +1,7 @@
 [Unit]
 Description=Mount backup destination folder
 After=network-online.target
+StopWhenUnneeded=true
 
 [Mount]
 What=//your/remote/folder
